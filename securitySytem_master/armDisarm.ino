@@ -1,15 +1,19 @@
 
 void armDisarm(void)
 {
+  msgbsy = 1; 
+  
   if(!arm)
   {
     digitalWrite(armLED, high); //show the user that we are armed
     arm = 1; //arm it
+    msg = ARM; 
   }
   else
   {
     digitalWrite(armLED, low); //tell the user that we are no longer armed
     arm = 0; //disarm it
+    msg = DISARM;
   }
 }
 

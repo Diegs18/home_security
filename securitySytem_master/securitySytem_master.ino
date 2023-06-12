@@ -11,7 +11,14 @@
   by Elochukwu Ifediora (fedy0)
 */
 byte arm = 0;
-byte home = 1; 
+byte home = 1;
+
+#define ARM  0
+#define DISARM  1
+byte msgbsy = 0;
+
+byte msg; 
+
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiAP.h>
@@ -65,6 +72,10 @@ void setup()
 void loop() {
   WiFiClient client = server.available();   // listen for incoming clients
 
+  if (msgTbsy)
+  {
+    msgHandler(msg);
+  }
 /*
   if (client) {                             // if you get a client,
     Serial.println("New Client.");           // print a message out the serial port
