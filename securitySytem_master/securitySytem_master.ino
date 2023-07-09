@@ -15,6 +15,9 @@ byte home = 1;
 
 #define ARM  0
 #define DISARM  1
+#define HOME 2
+#define AWAY 3
+
 byte msgbsy = 0;
 
 byte msg; 
@@ -72,9 +75,15 @@ void setup()
 void loop() {
   WiFiClient client = server.available();   // listen for incoming clients
 
-  if (msgTbsy)
-  {
-    msgHandler(msg);
+
+  if (client) // if you get a client,
+  {                             
+    Serial.println("New Client.");           // print a message out the serial port
+    String currentLine = "";                // make a String to hold incoming data from the client
+    while (client.connected()) // loop while the client's connected
+    {  
+      Serial.print("I see the client");  
+    }
   }
 /*
   if (client) {                             // if you get a client,
