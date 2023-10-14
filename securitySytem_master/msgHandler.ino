@@ -1,25 +1,25 @@
-void msgHandler (byte msg)
+void msgHandler (byte msg, WiFiClient client)
 {
   msgbsy = 0; 
   switch(msg)
   {
     case ARM: 
-      server.write("arm");
+      client.write("arm");
       arm = 1; //set up for next push
       Serial.print("Sending the Arm command.\n");
     break;
     case DISARM:
-      server.write("disarm");
+      client.write("disarm");
       arm = 0; //setup for next push
       Serial.print("Sending the Disarm command.\n");
     break; 
     case HOME:
-      server.write("home");
+      client.write("home");
       home = 1; //set up for next push
       Serial.print("Sending the Home command.\n");
     break;  
     case AWAY:
-      server.write("away");
+      client.write("away");
       home = 0; //set up for next push
       Serial.print("Sending the Away command.\n");
     break; 

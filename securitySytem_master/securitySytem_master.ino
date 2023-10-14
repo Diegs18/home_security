@@ -13,11 +13,11 @@
 byte arm = 0;
 byte home = 1;
 
-#define ARM  0
-#define DISARM  1
+#define ARM  1
+#define DISARM  0
 #define HOME 2
 #define AWAY 3
-
+#define NOT_HOME 0
 byte msgbsy = 0;
 
 byte msg; 
@@ -63,7 +63,7 @@ void setup()
   if (!WiFi.softAP(ssid, password)) {
     log_e("Soft AP creation failed.");
     while(1);
-  }
+  } 
   IPAddress myIP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
   Serial.println(myIP);
@@ -82,7 +82,8 @@ void loop() {
     String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected()) // loop while the client's connected
     {  
-      Serial.print("I see the client");  
+      if(msgbsy)
+        msgHandler(msg, client);
     }
   }
 /*
