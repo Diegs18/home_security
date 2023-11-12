@@ -1,26 +1,17 @@
-/*
-  WiFiAccessPoint.ino creates a WiFi access point and provides a web server on it.
-
-  Steps:
-  1. Connect to the access point "yourAp"
-  2. Point your web browser to http://192.168.4.1/H to turn the LED on or http://192.168.4.1/L to turn it off
-     OR
-     Run raw TCP "GET /H" and "GET /L" on PuTTY terminal with 192.168.4.1 as IP address and 80 as port
-
-  Created for arduino-esp32 on 04 July, 2018
-  by Elochukwu Ifediora (fedy0)
-*/
-byte arm = 0;
-byte home = 1;
-
 #define ARM  1
 #define DISARM  0
 #define HOME 2
 #define AWAY 3
 #define NOT_HOME 0
-byte msgbsy = 0;
 
+byte arm = 0;
+byte home = 1;
+byte msgbsy = 0;
 byte msg; 
+byte cnt = 0;
+byte ip[] = { 192, 168, 4, 2};
+byte debounced = 0;
+hw_timer_t *timer0 = NULL;
 
 #include <WiFi.h>
 #include <WiFiClient.h>
@@ -40,8 +31,10 @@ byte msg;
 const char *ssid = "FBI_Spotter_Van";
 const char *password = "security";
 
-WiFiServer server(80);
-
+void msgHandler (byte msg, WiFiClient client);
+void armDisarm(void);
+void homeAway(void);
+void IRAM_ATTR timer0_ISR();
 
 void setup() 
 {
@@ -53,6 +46,11 @@ void setup()
   pinMode(homeLED, OUTPUT);
   pinMode(homeButton, INPUT);
   attachInterrupt(digitalPinToInterrupt(homeButton), homeAway, RISING);
+
+  timer0 = timerBegin(0, 80, true);
+  timerAttachInterrupt(timer0, &timer0_ISR, true);
+  timerAlarmWrite(timer0, 500000, true);
+  timerAlarmEnable(timer0);
 
   Serial.begin(115200);
   Serial.println();
@@ -67,70 +65,30 @@ void setup()
   IPAddress myIP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
   Serial.println(myIP);
-  server.begin();
 
-  Serial.println("Server started");
 }
 
-void loop() {
-  WiFiClient client = server.available();   // listen for incoming clients
+void loop() 
+{
+  WiFiClient client;
 
-
-  if (client) // if you get a client,
-  {                             
-    Serial.println("New Client.");           // print a message out the serial port
-    String currentLine = "";                // make a String to hold incoming data from the client
-    while (client.connected()) // loop while the client's connected
-    {  
-      if(msgbsy)
-        msgHandler(msg, client);
-    }
-  }
-/*
-  if (client) {                             // if you get a client,
-    Serial.println("New Client.");           // print a message out the serial port
-    String currentLine = "";                // make a String to hold incoming data from the client
-    while (client.connected()) {            // loop while the client's connected
-      if (client.available()) {             // if there's bytes to read from the client,
-        char c = client.read();             // read a byte, then
-        Serial.write(c);                    // print it out the serial monitor
-        if (c == '\n') {                    // if the byte is a newline character
-
-          // if the current line is blank, you got two newline characters in a row.
-          // that's the end of the client HTTP request, so send a response:
-          if (currentLine.length() == 0) {
-            // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-            // and a content-type so the client knows what's coming, then a blank line:
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println();
-
-            // the content of the HTTP response follows the header:
-            client.print("Click <a href=\"/H\">here</a> to turn ON the LED.<br>");
-            client.print("Click <a href=\"/L\">here</a> to turn OFF the LED.<br>");
-
-            // The HTTP response ends with another blank line:
-            client.println();
-            // break out of the while loop:
-            break;
-          } else {    // if you got a newline, then clear currentLine:
-            currentLine = "";
-          }
-        } else if (c != '\r') {  // if you got anything else but a carriage return character,
-          currentLine += c;      // add it to the end of the currentLine
-        }
-
-        // Check to see if the client request was "GET /H" or "GET /L":
-        if (currentLine.endsWith("GET /H")) {
-          digitalWrite(LED_BUILTIN, HIGH);               // GET /H turns the LED on
-        }
-        if (currentLine.endsWith("GET /L")) {
-          digitalWrite(LED_BUILTIN, LOW);                // GET /L turns the LED off
+    if (client.connect(ip, 80)) 
+    {
+      Serial.println("connected to the server");
+      while (client.connected()) 
+      {
+        //if (client.available()) {
+        if(msgbsy)
+        {
+          msgHandler(msg, client);
         }
       }
+      //client.stop();
+      //Serial.println("Disconnected from server");
     }
-    // close the connection:
-    client.stop();
-    Serial.println("Client Disconnected.");
-  }*/
+    else
+    {
+      Serial.println("didn't connect, trying again");
+    }
 }
+
