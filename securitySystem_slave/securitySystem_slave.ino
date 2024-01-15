@@ -33,6 +33,7 @@ void loop() {
     {      
         String data = client.readStringUntil('\n');
         Serial.println(data);
+        
     }
   }
 }
