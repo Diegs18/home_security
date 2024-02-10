@@ -1,27 +1,14 @@
 
 void armDisarm(void)
 {
-  Serial.println("button pressed");
+  Serial.println("button pressed, deboucing now");
 
   if(debounced)
   {
     timerStart(timer0);
     debounced = 0;
-    if(!arm&&!msgbsy)
-    {
-      digitalWrite(armLED, high); //show the user that we are armed
-      msg = ARM; 
-      arm = ARM;
-      Serial.println("Armmed");
-      
-    }
-    else if(arm&&!msgbsy)
-    {
-      digitalWrite(armLED, low); //tell the user that we are no longer armed
-      msg = DISARM;
-      arm = DISARM;
-      Serial.println("Disarmmed");
-    }
+    armStat = !armStat;
+    msg = ARM_MSG;
     msgbsy = 1; 
   }
 }
@@ -32,18 +19,8 @@ void homeAway(void)
   {
     timerStart(timer0);
     debounced = 0;
-    if(!home&&!msgbsy)
-    {
-      digitalWrite(homeLED, high); //show the user that we are armed
-      msg = HOME;
-      home = HOME; 
-    }
-    else if (home&&!msgbsy)
-    {
-      digitalWrite(homeLED, low); //show the user that we are armed
-      msg = AWAY;
-      home = NOT_HOME;
-    }
+    msg = HOME_MSG;
+    homeStat = !homeStat; 
     msgbsy = 1; 
   }
 }

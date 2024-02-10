@@ -1,15 +1,30 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiAP.h>
+
+#define ARM  1
+#define DISARM  0
+#define HOME 1
+#define AWAY 0
+#define ARM_MSG 2
+#define HOME_MSG 3
+#define GETSTAT_MSG 4
+
 //WiFiClient client;
 int status = WL_IDLE_STATUS;
 const char ssid[] = "FBI_Spotter_Van";
 const char password[] = "security";
-//IPAddress server(74,125,115,105); /192.168.4.1
-//IPAddress server(192,168,4,1); //192.168.4.1
+
+byte homeStat = 0; 
+byte armStat = 0;
+byte msg = 0;
 WiFiServer server(80);
 
+
+
 void setup() {
+  Serial.print("The unitialized msg is: ");
+  Serial.println(msg);
   Serial.begin(115200);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -30,9 +45,14 @@ void loop() {
     Serial.println("New Client.");           // print a message out the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected()) // loop while the client's connected
-    {      
-        String data = client.readStringUntil('\n');
-        Serial.println(data);
+    {    
+        msg = client.read();
+        if(msg != 0)
+        {
+          Serial.print("The message outside the function is: ");
+          Serial.println(msg);
+          msg = msgHandler(msg, client);
+        }
         
     }
   }

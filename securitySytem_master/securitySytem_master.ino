@@ -1,11 +1,13 @@
 #define ARM  1
 #define DISARM  0
-#define HOME 2
-#define AWAY 3
-#define NOT_HOME 0
+#define HOME 1
+#define AWAY 0
+#define ARM_MSG 2
+#define HOME_MSG 3
+#define GETSTAT_MSG 4
 
-byte arm = 0;
-byte home = 1;
+byte armStat = ARM;
+byte homeStat = HOME;
 byte msgbsy = 0;
 byte msg; 
 byte cnt = 0;
