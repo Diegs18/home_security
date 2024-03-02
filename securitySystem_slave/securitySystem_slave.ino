@@ -45,14 +45,17 @@ void loop() {
     Serial.println("New Client.");           // print a message out the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected()) // loop while the client's connected
-    {    
+    {   
+      if(client.available())
+      { 
         msg = client.read();
-        if(msg != 0)
+        if(msg != -1)
         {
           Serial.print("The message outside the function is: ");
           Serial.println(msg);
           msg = msgHandler(msg, client);
         }
+      }
         
     }
   }

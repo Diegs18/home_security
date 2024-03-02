@@ -9,10 +9,13 @@
 byte armStat = ARM;
 byte homeStat = HOME;
 byte msgbsy = 0;
-byte msg; 
+byte msg, rxmsg; 
 byte cnt = 0;
 byte ip[] = { 192, 168, 4, 2};
 byte debounced = 0;
+byte rxFlg=0;
+byte wait4resp = 0;
+byte msgDone = 0;
 hw_timer_t *timer0 = NULL;
 
 #include <WiFi.h>
@@ -80,9 +83,31 @@ void loop()
       while (client.connected()) 
       {
         //if (client.available()) {
-        if(msgbsy)
+        if(!wait4resp)
         {
-          msgHandler(msg, client);
+          wait4resp = 1; 
+          if(msgbsy) 
+          {
+            //msgHandler(msg, client);
+            client.write(msg);
+          }
+          else
+          {
+            //msgHandler(GET_STAT)
+            client.write(GETSTAT_MSG);
+            Serial.println("getting status");
+          }
+        }
+        if(client.available()&&wait4resp)
+        {
+          rxmsgHandler(client);
+        }
+        if(msgDone)
+        {
+          wait4resp = 0; 
+          msgDone = 0;
+          Serial.print("Message complete disconnecting");
+          client.stop();
         }
       }
       //client.stop();

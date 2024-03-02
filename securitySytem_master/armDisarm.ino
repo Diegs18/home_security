@@ -7,7 +7,6 @@ void armDisarm(void)
   {
     timerStart(timer0);
     debounced = 0;
-    armStat = !armStat;
     msg = ARM_MSG;
     msgbsy = 1; 
   }
@@ -22,13 +21,23 @@ void homeAway(void)
     msg = HOME_MSG;
     homeStat = !homeStat; 
     msgbsy = 1; 
+
   }
 }
-void armState(void)
+void armState(byte msg)
 {
-  
+  Serial.print("Arm State is: ");
+  Serial.println(msg);
+  armStat = msg;
+  digitalWrite(armLED, msg);
 }
-
+void homeState(byte msg)
+{
+  Serial.print("Home State is: ");
+  Serial.println(msg);
+  homeStat = msg;
+  digitalWrite(homeLED, msg);
+}
 
 void IRAM_ATTR timer0_ISR()
 {
