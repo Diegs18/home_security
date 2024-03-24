@@ -30,6 +30,7 @@ hw_timer_t *timer0 = NULL;
 #define homeButton 16
 #define homeLED 17
 
+#define buzzer 5
 #define high 1
 #define low 0
 // Set these to your desired credentials.
@@ -51,6 +52,8 @@ void setup()
   pinMode(homeLED, OUTPUT);
   pinMode(homeButton, INPUT);
   attachInterrupt(digitalPinToInterrupt(homeButton), homeAway, RISING);
+
+  pinMode(buzzer, OUTPUT);
 
   timer0 = timerBegin(0, 80, true);
   timerAttachInterrupt(timer0, &timer0_ISR, true);
@@ -75,6 +78,9 @@ void setup()
 
 void loop() 
 {
+  //tone(1000, buzzer);
+  //buzz(3);
+  Serial.println("here again");
   WiFiClient client;
 
     if (client.connect(ip, 80)) 
@@ -119,3 +125,26 @@ void loop()
     }
 }
 
+
+void buzz(int freq)
+{
+  while(1)
+  {
+     //output an frequency
+   for(int i=0;i<80;i++)
+   {
+    digitalWrite(buzzer,HIGH);
+    delay(100);//wait for 1ms
+    digitalWrite(buzzer,LOW);
+    delay(100);//wait for 1ms
+    }
+    //output another frequency
+    for(int i=0;i<80;i++)
+    {
+      digitalWrite(buzzer,HIGH);
+      delay(2);//wait for 2ms
+      digitalWrite(buzzer,LOW);
+      delay(2);//wait for 2ms
+    }
+  }
+}
